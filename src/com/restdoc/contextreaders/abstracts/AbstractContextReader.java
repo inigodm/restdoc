@@ -33,4 +33,7 @@ public abstract class AbstractContextReader {
 		return ctxReader;
 	}
 	
+	public static void setContextReader(AbstractContextReader context){
+		ctxReader = context;
+	}
 }

@@ -7,6 +7,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+
 import com.documentation.annotations.exceptions.NotARESTServiceException;
 import com.documentation.model.DocClass;
 import com.documentation.model.DocSerMethod;
@@ -21,16 +27,16 @@ import com.restdoc.docbuilders.classdocbuilders.DTODocGenerator;
  * @author inigo
  *
  */
-public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
+public class ServiceDocJAXRSConcreteBuilder extends ServiceDocBuilder {
 	RESTService ser;
-	String path;
+	Path path;
 	Class<?> annotatedClass;
 	DocService serviceDocument;
 	Set<Class<?>> models;
 	String[] dtopaths;
 	
-	public ServiceDocRESTDOCConcreteBuilder(){
-		super(RESTService.class);
+	public ServiceDocJAXRSConcreteBuilder(){
+		super(Path.class, RESTService.class);
 	}
 	
 	@Override
@@ -66,7 +72,7 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 			this.annotatedClass = annotatedClass;
 			this.serviceDocument = new DocService();
 			this.ser = (RESTService) annotatedClass.getAnnotation(annotationToLocateInClasses);
-			this.path = ser.path();
+			this.path = (Path) annotatedClass.getAnnotation(annotationPath);
 			this.dtoDocGenerator = new DTODocGenerator(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
 			this.dtoDocGenerator.setupForService(annotatedClass);
 			
@@ -80,7 +86,7 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 	 * @see com.documentation.annotations.utils.ServiceDocGenerator#getServiceDocumentation()
 	 */
 	public DocService getServiceDocumentation(){
-		serviceDocument.setPath(path);
+		serviceDocument.setPath(path.value());
 		serviceDocument.setDescription(ser.description());
 		serviceDocument.setMethods(getMethodsData());
 		serviceDocument.setModelpath(ser.modelpath());
@@ -92,8 +98,10 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 	 */
 	private ArrayList<DocSerMethod> getMethodsData() {
 		ArrayList<DocSerMethod> result = new ArrayList<DocSerMethod>();
-		ArrayList<Method> methods = Utils.getMethodsAnnotatedWith(annotatedClass, RESTMethod.class);
-		insertMethodsAnnotatedDoc(result, methods);
+		insertMethodsAnnotatedDoc(result, GET.class, annotatedClass);
+		insertMethodsAnnotatedDoc(result, PUT.class, annotatedClass);
+		insertMethodsAnnotatedDoc(result, POST.class, annotatedClass);
+		insertMethodsAnnotatedDoc(result, DELETE.class, annotatedClass);
 		return result;
 	}
 	
@@ -103,10 +111,11 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 	 * @param clase
 	 * @return
 	 */
-	private ArrayList<DocSerMethod> insertMethodsAnnotatedDoc(ArrayList<DocSerMethod> buffer,ArrayList<Method> methods){
+	private ArrayList<DocSerMethod> insertMethodsAnnotatedDoc(ArrayList<DocSerMethod> buffer,Class<? extends Annotation> annotation, Class<?> clase){
+		ArrayList<Method> methods = Utils.getMethodsAnnotatedWith(clase, annotation);
 		DocSerMethod methodDocument = null;
 		for (Method method : methods) {
-			methodDocument = buildMethodDoc(method);
+			methodDocument = buildMethodDoc(method, annotation);
 			if (methodDocument != null){
 				buffer.add(methodDocument);
 			}
@@ -114,14 +123,19 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 		return buffer;
 	}
 	
-	private DocSerMethod buildMethodDoc(Method method){
-		RESTMethod mets = method.getAnnotation(RESTMethod.class);
+	private DocSerMethod buildMethodDoc(Method method, Class<? extends Annotation> annotation){
+		//TODO: Esto obtiene el path... debiera estar ya
+    	String strpath = "/";
+    	if ((path = method.getAnnotation(Path.class)) != null){
+        	strpath = path.value();
+    	}
+    	RESTMethod mets = method.getAnnotation(RESTMethod.class);
     	DocSerMethod methodDocument = null;
     	if (mets != null){
     		methodDocument = new DocSerMethod();
-    		methodDocument.setMethod(mets.httpMethod());
+    		methodDocument.setMethod(annotation.getSimpleName());
     		methodDocument.setDescription(mets.description());
-    		methodDocument.setPath(mets.path());
+    		methodDocument.setPath(strpath);
     		methodDocument.setModelpath(mets.modelpath());
     		methodDocument.setProducedMimetype(mets.productedMimetype());
     		methodDocument.setProducedObject(getClassDoc(mets.producedObject()));

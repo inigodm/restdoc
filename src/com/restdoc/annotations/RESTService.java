@@ -10,4 +10,8 @@ import java.lang.annotation.Target;
 public @interface RESTService {
 	public String description() default "";
 	public String modelpath() default "";
+	/** Path of the service: the URL in which it will be
+	 * @return
+	 */
+	public String path() default "";
 }

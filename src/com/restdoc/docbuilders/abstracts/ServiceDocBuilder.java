@@ -22,17 +22,28 @@ public abstract class ServiceDocBuilder {
 	 */
 	protected Class<? extends Annotation> annotationToLocateInClasses;
 	/**
-	 * Used to get the annotation class which gives the info of the path of the service.
+	 * Path of the service.
 	 */
+	@Deprecated
 	protected Class<? extends Annotation> annotationPath;
 	
+	/** Builder to generate documentation from a REST service
+	 * Not use: Depends too much from JAX-RS.
+	 * @param pathAnn
+	 * @param restServiceAnn
+	 */
+	@Deprecated
+	protected ServiceDocBuilder(Class<? extends Annotation> pathAnn, Class<? extends Annotation> restServiceAnn){
+		dtoDocGenerator = new DTODocGenerator(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
+		annotationPath = pathAnn;
+		annotationToLocateInClasses = restServiceAnn;
+	}
 	/** Builder to generate documentation from a REST service
 	 * @param pathAnn
 	 * @param restServiceAnn
 	 */
-	protected ServiceDocBuilder(Class<? extends Annotation> pathAnn, Class<? extends Annotation> restServiceAnn){
+	protected ServiceDocBuilder(Class<? extends Annotation> restServiceAnn){
 		dtoDocGenerator = new DTODocGenerator(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
-		annotationPath = pathAnn;
 		annotationToLocateInClasses = restServiceAnn;
 	}
 	/** Obtiene la informacion del servicio que con el que se ha inicializado
