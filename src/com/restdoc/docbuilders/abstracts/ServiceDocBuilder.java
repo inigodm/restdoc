@@ -75,7 +75,7 @@ public abstract class ServiceDocBuilder {
 		Reflections services = new Reflections(packageToScan);
 		// obtenemos todos los servicios
 		Set<Class<?>> annotated = services.getTypesAnnotatedWith(annotationToLocateInClasses);
-		List<Class<?>> result = new ArrayList<>();
+		List<Class<?>> result = new ArrayList<Class<?>>();
 		for (Class<?> clase : annotated){
 			if (clase.getAnnotation(annotationToLocateInClasses) != null){
 				result.add(clase);

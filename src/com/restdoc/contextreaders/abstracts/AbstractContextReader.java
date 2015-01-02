@@ -18,11 +18,26 @@ public abstract class AbstractContextReader {
 			try {
 				Constructor<?> cons= (Constructor<?>) Class.forName(contextClass).getConstructor(ResourceConfig.class);
 				ctxReader = (AbstractContextReader) cons.newInstance(context);
-			} catch (NoSuchMethodException | SecurityException
-					| ClassNotFoundException | InstantiationException
-					| IllegalAccessException | IllegalArgumentException
-					| InvocationTargetException e) {
-				System.err.println("ERROR: No se ha podido obtener el context reader " + e.getMessage());
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
