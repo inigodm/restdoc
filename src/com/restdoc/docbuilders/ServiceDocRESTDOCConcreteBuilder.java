@@ -1,10 +1,7 @@
 package com.restdoc.docbuilders;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import com.documentation.annotations.exceptions.NotARESTServiceException;
@@ -34,21 +31,6 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 	}
 	
 	@Override
-	public Collection<? extends DocService> buildDocForPackage(String packag) {
-		List<Class<?>> clases = getAllRESTServicesFromPackage(packag);
-		List<DocService> serv = new ArrayList<DocService>();
-		DocService aux;
-		for (Class<?> clase : clases){
-			// se ha comprobado que tiene la anotacion en el getRESTServiceClass
-			aux = buildDocForClass(clase);
-			if (aux != null){
-				serv.add(aux);
-			}
-		}
-		return serv;
-	}
-	
-	@Override
 	public DocService buildDocForClass(Class<?> clazz){
 		DocService res = null;
 		try {
@@ -61,6 +43,12 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 	}
 	
 	@Override
+	public DocService getServiceDocForClass(Class<?> annotatedClass)
+			throws NotARESTServiceException {
+		setupForClass(annotatedClass);
+		return getServiceDocumentation();
+	}
+	
 	public void setupForClass(Class<?> annotatedClass) throws NotARESTServiceException {
 		try {
 			this.annotatedClass = annotatedClass;
@@ -92,7 +80,7 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 	 */
 	private ArrayList<DocSerMethod> getMethodsData() {
 		ArrayList<DocSerMethod> result = new ArrayList<DocSerMethod>();
-		ArrayList<Method> methods = Utils.getMethodsAnnotatedWith(annotatedClass, RESTMethod.class);
+		ArrayList<Method> methods = getMethodsAnnotatedWith(annotatedClass, RESTMethod.class);
 		insertMethodsAnnotatedDoc(result, methods);
 		return result;
 	}

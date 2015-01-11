@@ -1,6 +1,7 @@
 package com.restdoc.docbuilders.abstracts;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,23 +22,12 @@ public abstract class ServiceDocBuilder {
 	 * ServiceDocBuilder is able to scan for info
 	 */
 	protected Class<? extends Annotation> annotationToLocateInClasses;
-	/**
-	 * Path of the service.
-	 */
-	@Deprecated
-	protected Class<? extends Annotation> annotationPath;
 	
-	/** Builder to generate documentation from a REST service
-	 * Not use: Depends too much from JAX-RS.
-	 * @param pathAnn
-	 * @param restServiceAnn
+	/** Obtains or generates docs for setted service
+	 * @return
 	 */
-	@Deprecated
-	protected ServiceDocBuilder(Class<? extends Annotation> pathAnn, Class<? extends Annotation> restServiceAnn){
-		dtoDocGenerator = new DTODocGenerator(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
-		annotationPath = pathAnn;
-		annotationToLocateInClasses = restServiceAnn;
-	}
+	public abstract DocService getServiceDocForClass(Class<?> annotatedClass) throws NotARESTServiceException;
+	
 	/** Builder to generate documentation from a REST service
 	 * @param pathAnn
 	 * @param restServiceAnn
@@ -46,10 +36,6 @@ public abstract class ServiceDocBuilder {
 		dtoDocGenerator = new DTODocGenerator(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
 		annotationToLocateInClasses = restServiceAnn;
 	}
-	/** Obtiene la informacion del servicio que con el que se ha inicializado
-	 * @return
-	 */
-	public abstract void setupForClass(Class<?> annotatedClass) throws NotARESTServiceException;
 	
 	/** Method to build documentation for a given package.It search for REST service annotations in that package
 	 * and returns generated doc.
@@ -57,14 +43,34 @@ public abstract class ServiceDocBuilder {
 	 * @param packag
 	 * @return
 	 */
-	public abstract Collection<? extends DocService> buildDocForPackage(String packag);
+	public Collection<? extends DocService> buildDocForPackage(String packag) {
+		List<Class<?>> clases = getAllRESTServicesFromPackage(packag);
+		List<DocService> serv = new ArrayList<DocService>();
+		DocService aux;
+		for (Class<?> clase : clases){
+			// se ha comprobado que tiene la anotacion en el getRESTServiceClass
+			aux = buildDocForClass(clase);
+			if (aux != null){
+				serv.add(aux);
+			}
+		}
+		return serv;
+	}
 	
 	/** Method to build documentation for a given class. To do it it search for an annotations of a REST service 
 	 * in given class and generates apropiate documentation
 	 * @param clazz
 	 * @return
 	 */
-	public abstract DocService buildDocForClass(Class<?> clazz) ;
+	public DocService buildDocForClass(Class<?> clazz){
+		DocService res = null;
+		try {
+			res = getServiceDocForClass(clazz);
+		} catch (NotARESTServiceException e) {
+			e.printStackTrace();
+		}
+		return res;
+	}
 	
 	/** Scans a package to search classes which are REST services.
 	 * @param <T>
@@ -86,6 +92,22 @@ public abstract class ServiceDocBuilder {
 			throw new NotFoundException();
 		}
 		return result;
+	}
+	
+	/**
+	 * @param clase
+	 * @param classMethod
+	 * @return
+	 */
+	public ArrayList<Method> getMethodsAnnotatedWith(Class<?> clase, Class<? extends Annotation> classMethod){
+		Method[] methodsAux = clase.getMethods();
+		ArrayList<Method> methods = new ArrayList<Method>();
+		for (Method method : methodsAux){
+			if (method.getAnnotation(classMethod) != null){
+				methods.add(method);
+			}
+		}
+		return methods;
 	}
 }
 
