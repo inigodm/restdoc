@@ -48,7 +48,7 @@ public class RESTDocService {
 	@GET
 	@Path("all")
 	@Produces(MediaType.APPLICATION_JSON)
-	@RESTMethod(path="all", description="Returns objects describing the services in this web application", producedObject="DocService", productedMimetype="JSON")
+	@RESTMethod(httpMethod="GET", path="all", description="Returns objects describing the services in this web application", producedObject="DocService", productedMimetype="JSON")
 	public DocServices doGet(){
 		contexReader = AbstractContextReader.initContextReader(context, "com.restdoc.contextreaders.DefaultContextReader");
 		String[] jerseyPath = contexReader.readPackagesToDocumentate();
