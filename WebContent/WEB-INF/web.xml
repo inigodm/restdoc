@@ -10,6 +10,10 @@
 			<param-value>com.restdoc.services</param-value>
 		</init-param>
 		<init-param>
+			<param-name>com.restdoc.models</param-name>
+			<param-value>com.documentation.model</param-value>
+		</init-param>
+		<init-param>
 			<param-name>com.restdoc.generators</param-name>
 			<param-value>com.restdoc.docbuilders.ServiceDocRESTDOCConcreteBuilder</param-value>
 		</init-param>
