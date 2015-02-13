@@ -2,20 +2,17 @@ package com.restdoc.docbuilders.classdocbuilders;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Set;
 
 import org.reflections.Reflections;
 
 import com.documentation.annotations.exceptions.NotARESTServiceException;
 import com.documentation.model.DocClass;
-import com.documentation.model.DocClasses;
 import com.documentation.model.DocField;
 import com.restdoc.annotations.ModelClass;
 import com.restdoc.annotations.ModelMethod;
 import com.restdoc.annotations.RESTService;
 
-public class RESTDocDTOBuilder implements DTODocBuilder{
-	Set<Class<?>> models;
+public class RESTDocDTOBuilder extends DTODocBuilder{
 	
 	@Override
 	public void setupForService(Class<?> annotatedClass) throws NotARESTServiceException{
@@ -24,40 +21,11 @@ public class RESTDocDTOBuilder implements DTODocBuilder{
 		this.models = model.getTypesAnnotatedWith(ModelClass.class);
 	}
 	
-	@Override
-	public DocClass buildDoc(String className) {
-		boolean isAnArray = false;
-		String classNameClean;
-		if (className.endsWith("[]")){
-			isAnArray = true;
-			classNameClean = className.substring(0, className.length() - 2);
-		}else{
-			classNameClean = className;
-		}
-		for (Class<?> annClass : models){
-			if (annClass.getSimpleName().equals(classNameClean)){
-				if (isAnArray){
-					return fillArrayDoc(annClass);
-				}
-				return fillClassDoc(annClass);
-			}
-		}
-		return fillPrimitiveOrJavaObject(classNameClean);
-	}
-	
-	private DocClasses fillArrayDoc(Class<?> annClass){
-		DocClasses container = new DocClasses();
-		ArrayList<DocClass> aux = new ArrayList<DocClass>();
-		aux.add(fillClassDoc(annClass));
-		container.setObjects(aux);
-		return container;
-	}
-	
 	/** Rellena la informacion del objeto con la que se encuentra en las anotaciones de la clase que se le pasa como parametro
 	 * @param objectClass
 	 * @return un objeto con toda la informacion recopilada
 	 */
-	private DocClass fillClassDoc(Class<?> objectClass){
+	protected DocClass fillClassDoc(Class<?> objectClass){
 		ModelClass ann = objectClass.getAnnotation(ModelClass.class);
 		DocClass objectDocument = new DocClass();
 		objectDocument.setName(ann.name());
@@ -67,11 +35,6 @@ public class RESTDocDTOBuilder implements DTODocBuilder{
 		return objectDocument;		
 	}
 	
-	private DocClass fillPrimitiveOrJavaObject(String clase){
-		DocClass obj = new DocClass();
-		obj.setName(clase);
-		return obj;
-	}
 	/** Obtiene la informacion de los campos del objeto que se envia.
 	 * @param annClass
 	 * @return

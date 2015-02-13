@@ -30,5 +30,4 @@ public class DocServices {
 	public void setServices(List<DocService> services) {
 		this.services = services;
 	}
-	
 }

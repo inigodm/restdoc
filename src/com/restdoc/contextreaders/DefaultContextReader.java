@@ -17,28 +17,28 @@ public class DefaultContextReader extends AbstractContextReader {
 
 	@Override
 	public String[] readAvailableDocGenerators() {
-		String[] generators = ((String) context.getProperty("com.restdoc.generators")).split(";");
-		if (generators == null || generators.length == 0){
-			return new String[]{"com.restdoc.docbuilders.ServiceDocRESTDOCConcreteBuilder"};
-		}
-		return generators;
+		return getProperty("com.restdoc.generators", new String[]{"com.restdoc.docbuilders.ServiceDocRESTDOCConcreteBuilder"});
 	}
 
 	@Override
-	public String[] readPathsToDTOs() {
-		String path = ((String) context.getProperty("com.restdoc.pathstoDTOs"));
-		if (path == null || path.length() == 0){
-			return new String[]{};
-		}
-		return path.split(";");
+	public String[] readPathsToModels() {
+		return getProperty("com.restdoc.models", new String[]{});
 	}
 	
 	@Override
 	public String[] readAvailableDTODocGenerators() {
-		String generators = ((String) context.getProperty("com.restdoc.dtogenerators"));
-		if (generators == null || generators.length() == 0){
-			return new String[]{"com.restdoc.docbuilders.classdocbuilders.RESTDocDTOBuilder"};
+		return getProperty("com.restdoc.dtogenerators", new String[]{"com.restdoc.docbuilders.classdocbuilders.RESTDocDTOBuilder"});
+	}
+	
+	private String[] getProperty(String property, String[] defaultValue){
+		String prop = getPropertyFromContext(property);
+		if (prop == null || prop.length() == 0){
+			return defaultValue;
 		}
-		return generators.split(";");
+		return prop.split(";");		
+	}
+
+	private String getPropertyFromContext(String property){
+		return ((String) context.getProperty(property));
 	}
 }

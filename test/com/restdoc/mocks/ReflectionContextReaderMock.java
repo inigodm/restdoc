@@ -2,7 +2,7 @@ package com.restdoc.mocks;
 
 import com.restdoc.contextreaders.abstracts.AbstractContextReader;
 
-public class ContextReaderMock extends AbstractContextReader {
+public class ReflectionContextReaderMock extends AbstractContextReader {
 
 	@Override
 	public String[] readPackagesToDocumentate() {
@@ -11,12 +11,14 @@ public class ContextReaderMock extends AbstractContextReader {
 	
 	@Override
 	public String[] readAvailableDTODocGenerators() {
-		return new String[] {"com.restdoc.docbuilders.classdocbuilders.RESTDocDTOBuilder"};
+		System.out.println("Using ReflectionDTOBuilder as DTO documentation builder");
+		return new String[] {"com.restdoc.docbuilders.classdocbuilders.ReflectionDTOBuilder"};
 	}
 
 	@Override
 	public String[] readAvailableDocGenerators() {
-		return new String[]{"com.restdoc.docbuilders.ServiceDocRESTDOCConcreteBuilder"};
+		System.out.println("Using ServiceDocJAXRSConcreteBuilder as service documentation builder");
+		return new String[]{"com.restdoc.docbuilders.ServiceDocJAXRSConcreteBuilder"};
 	}
 
 	@Override

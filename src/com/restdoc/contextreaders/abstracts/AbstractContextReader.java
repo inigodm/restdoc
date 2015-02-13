@@ -10,7 +10,7 @@ public abstract class AbstractContextReader {
 	
 	public abstract String[] readPackagesToDocumentate();
 	public abstract String[] readAvailableDocGenerators();
-	public abstract String[] readPathsToDTOs();
+	public abstract String[] readPathsToModels();
 	public abstract String[] readAvailableDTODocGenerators();
 	
 	public static AbstractContextReader initContextReader(ResourceConfig context, String contextClass){

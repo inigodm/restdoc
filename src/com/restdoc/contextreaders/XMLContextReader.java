@@ -15,7 +15,7 @@ public class XMLContextReader extends AbstractContextReader {
 	}
 
 	@Override
-	public String[] readPathsToDTOs() {
+	public String[] readPathsToModels() {
 		return null;
 	}
 
