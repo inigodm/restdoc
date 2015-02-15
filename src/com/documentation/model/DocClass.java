@@ -14,6 +14,7 @@ public class DocClass {
 	private String description;
 	private String version;
 	private List<DocField> fields;
+	private List<DocClass> generics;
 	//private String packagePath;
 	/**
 	 * @return the name
@@ -66,5 +67,11 @@ public class DocClass {
 	 */
 	public void setFields(List<DocField> arrayList) {
 		this.fields = arrayList;
+	}
+	public List<DocClass> getGenerics() {
+		return generics;
+	}
+	public void setGenerics(List<DocClass> generics) {
+		this.generics = generics;
 	}
 }

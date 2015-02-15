@@ -51,8 +51,6 @@ public class ServiceDocJAXRSConcreteBuilder extends ServiceDocBuilder {
 			this.serviceDocument = new DocService();
 			this.path = (Path) annotatedClass.getAnnotation(Path.class);
 			this.dtoDocGenerator = new DTODocGenerator(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
-			this.dtoDocGenerator.setupForService(annotatedClass);
-			
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			throw new NotARESTServiceException("La clase "+ annotatedClass.getName()+ " no se ha podido leer como @RESTService", e);
@@ -104,7 +102,7 @@ public class ServiceDocJAXRSConcreteBuilder extends ServiceDocBuilder {
 		DocSerMethod methodDocument = new DocSerMethod();
 		AnnotationsManager annManager = new AnnotationsManager(method, methodDocument);
     	ReflectionInfoBuilder refManager = new ReflectionInfoBuilder(methodDocument);
-    	System.out.println("Se ejecutra desde:" + method.toString());
+    	annManager.putAnnotationsInfo(method.getAnnotations());
     	refManager.extractInfoFromReturnedType(method);
     	//annManager.extractInfoFromParams();
     	return methodDocument;
@@ -141,8 +139,6 @@ class ReflectionInfoBuilder{
 	
 	public void extractInfoFromReturnedType(Method method){
 		Class<?> returnedClass = method.getReturnType();
-		System.out.println(rdtob);
-		System.out.println(returnedClass.getCanonicalName());
 		methodDocument.setProducedObject(rdtob.buildDoc(returnedClass.getName()));
 	}
 }
@@ -161,6 +157,12 @@ class AnnotationsManager{
 		methodAnnotationExtractors.put(PUT.class, new PutExtractor(methodDocument));
 		methodAnnotationExtractors.put(POST.class, new PostExtractor(methodDocument));
 		methodAnnotationExtractors.put(DELETE.class, new DeleteExtractor(methodDocument));
+	}
+
+	public void putAnnotationsInfo(Annotation[] annotations) {
+		for (Annotation ann : method.getAnnotations()){
+    		putAnnotationInfo(ann);
+    	}
 	}
 
 	public void putAnnotationInfo(Annotation annotation){

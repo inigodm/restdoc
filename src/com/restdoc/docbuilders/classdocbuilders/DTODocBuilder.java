@@ -9,6 +9,7 @@ import java.util.Set;
 import com.documentation.annotations.exceptions.NotARESTServiceException;
 import com.documentation.model.DocClass;
 import com.documentation.model.DocClasses;
+import com.restdoc.contextreaders.abstracts.AbstractContextReader;
 
 /**
  * @author inigo
@@ -19,33 +20,50 @@ public abstract class DTODocBuilder {
 	 * Classes that will be scanned to documentate
 	 */
 	protected Set<Class<?>> models;
+	protected ArrayList<String> buildedDoc = new ArrayList<String>();
+	String[] modelPaths;
+	
+	public DTODocBuilder(){
+		AbstractContextReader ctxReader = AbstractContextReader.getContextReader();
+		modelPaths = ctxReader.readPathsToModels();
+	}
+	
 	/**
 	 * Build the documentation that will be server for a DTO class
 	 * @param className
 	 * @return
 	 */
 	public DocClass buildDoc(String className) {
+		if (buildedDoc.contains(className)){
+			return fillPrimitiveOrJavaObject(className);
+		}
+		buildedDoc.add(className);
 		boolean isAnArray = false;
-		String classNameClean;
+		String classNameClean = className;
 		if (className.endsWith("[]")){
 			isAnArray = true;
 			classNameClean = className.substring(0, className.length() - 2);
-		}else{
-			classNameClean = className;
 		}
-		System.out.println(models);
-		for (Class<?> annClass : models){
-			System.out.println(annClass.getSimpleName() + " = " + className + "??");
-			if (annClass.getSimpleName().equals(classNameClean)){
-				if (isAnArray){
-					return fillArrayDoc(annClass);
-				}
-				return fillClassDoc(annClass);
-			}
-		}
-		return fillPrimitiveOrJavaObject(classNameClean);
+		return createDoc(classNameClean, isAnArray);
 	}
-	
+
+	private DocClass createDoc(String classname, boolean isAnArray){
+		try {
+			for (String path : modelPaths){
+				if (classname.startsWith(path)){
+					Class<?> c = ClassLoader.getSystemClassLoader().loadClass(classname);
+					if (isAnArray){
+						return fillArrayDoc(c);
+					}
+					return fillClassDoc(c);
+				}
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return fillPrimitiveOrJavaObject(classname);
+	}
+
 	/** Method to fill the build the info that must be extracted from java API class. 
 	 * We usually don't have to do any reflections on this 
 	 * @param annArray the array to extract info from
@@ -81,5 +99,5 @@ public abstract class DTODocBuilder {
 	 * @param annotatedClass
 	 * @throws NotARESTServiceException 
 	 */
-	protected abstract void setupForService(Class<?> annotatedClass) throws NotARESTServiceException;
+	//protected abstract void setupForService(Class<?> annotatedClass) throws NotARESTServiceException;
 }

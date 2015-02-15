@@ -14,13 +14,6 @@ import com.restdoc.annotations.RESTService;
 
 public class RESTDocDTOBuilder extends DTODocBuilder{
 	
-	@Override
-	public void setupForService(Class<?> annotatedClass) throws NotARESTServiceException{
-		RESTService ser = (RESTService) annotatedClass.getAnnotation(RESTService.class);
-		Reflections model = getModelFromServiceAnnotation(ser);
-		this.models = model.getTypesAnnotatedWith(ModelClass.class);
-	}
-	
 	/** Rellena la informacion del objeto con la que se encuentra en las anotaciones de la clase que se le pasa como parametro
 	 * @param objectClass
 	 * @return un objeto con toda la informacion recopilada

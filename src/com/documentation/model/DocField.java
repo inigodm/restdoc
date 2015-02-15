@@ -1,5 +1,7 @@
 package com.documentation.model;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
@@ -10,6 +12,7 @@ public class DocField {
 	private String required;
 	private String size;
 	private DocClass typeDesc;
+	private List<DocClass> generics;
 	/**
 	 * @return the name
 	 */
@@ -81,5 +84,11 @@ public class DocField {
 	 */
 	public void setTypeDesc(DocClass typeDesc) {
 		this.typeDesc = typeDesc;
+	}
+	public List<DocClass> getGenerics() {
+		return generics;
+	}
+	public void setGenerics(List<DocClass> generics) {
+		this.generics = generics;
 	}
 }

@@ -56,8 +56,6 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 			this.ser = (RESTService) annotatedClass.getAnnotation(annotationToLocateInClasses);
 			this.path = ser.path();
 			this.dtoDocGenerator = new DTODocGenerator(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
-			this.dtoDocGenerator.setupForService(annotatedClass);
-			
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			throw new NotARESTServiceException("La clase "+ annotatedClass.getName()+ " no se ha podido leer como @RESTService", e);
