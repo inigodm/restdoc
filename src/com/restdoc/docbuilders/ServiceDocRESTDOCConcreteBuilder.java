@@ -12,7 +12,7 @@ import com.restdoc.annotations.RESTMethod;
 import com.restdoc.annotations.RESTService;
 import com.restdoc.contextreaders.abstracts.AbstractContextReader;
 import com.restdoc.docbuilders.abstracts.ServiceDocBuilder;
-import com.restdoc.docbuilders.classdocbuilders.DTODocGenerator;
+import com.restdoc.docbuilders.classdocbuilders.DTODocDirector;
 
 /** Genera los datos de un servicio
  * @author inigo
@@ -55,7 +55,7 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 			this.serviceDocument = new DocService();
 			this.ser = (RESTService) annotatedClass.getAnnotation(annotationToLocateInClasses);
 			this.path = ser.path();
-			this.dtoDocGenerator = new DTODocGenerator(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
+			this.dtoDocDirector = new DTODocDirector(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			throw new NotARESTServiceException("La clase "+ annotatedClass.getName()+ " no se ha podido leer como @RESTService", e);
@@ -118,7 +118,7 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 	}
 	
 	public DocClass getClassDoc(String classname){
-		return dtoDocGenerator.buildDoc(classname);
+		return dtoDocDirector.buildDoc(classname);
 	}
 
 	public String[] getDtopaths() {

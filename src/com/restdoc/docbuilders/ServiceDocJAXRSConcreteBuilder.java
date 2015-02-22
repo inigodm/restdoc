@@ -20,7 +20,7 @@ import com.documentation.model.DocSerMethod;
 import com.documentation.model.DocService;
 import com.restdoc.contextreaders.abstracts.AbstractContextReader;
 import com.restdoc.docbuilders.abstracts.ServiceDocBuilder;
-import com.restdoc.docbuilders.classdocbuilders.DTODocGenerator;
+import com.restdoc.docbuilders.classdocbuilders.DTODocDirector;
 import com.restdoc.docbuilders.classdocbuilders.ReflectionDTOBuilder;
 
 /** Genera los datos de un servicio a partir de las etiquetas JAX-RS
@@ -50,7 +50,7 @@ public class ServiceDocJAXRSConcreteBuilder extends ServiceDocBuilder {
 			this.annotatedClass = annotatedClass;
 			this.serviceDocument = new DocService();
 			this.path = (Path) annotatedClass.getAnnotation(Path.class);
-			this.dtoDocGenerator = new DTODocGenerator(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
+			this.dtoDocDirector = new DTODocDirector(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			throw new NotARESTServiceException("La clase "+ annotatedClass.getName()+ " no se ha podido leer como @RESTService", e);
@@ -109,7 +109,7 @@ public class ServiceDocJAXRSConcreteBuilder extends ServiceDocBuilder {
 	}
 	
 	public DocClass getClassDoc(String classname){
-		return dtoDocGenerator.buildDoc(classname);
+		return dtoDocDirector.buildDoc(classname);
 	}
 
 	public String[] getDtopaths() {

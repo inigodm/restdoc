@@ -4,11 +4,20 @@ import java.util.ArrayList;
 
 import com.documentation.model.DocClass;
 
-public abstract class DTODocDirector {
+public class DTODocDirector {
 	ArrayList<DTODocBuilder> builders = new ArrayList<DTODocBuilder>();
 	
-	//public abstract void setupForService(Class<?> annotatedClass);
-	abstract DocClass buildDoc(String className);
+	public DocClass buildDoc(String className) {
+		DocClass res = null;
+		for (DTODocBuilder builder : builders){
+			res = builder.buildDoc(className);
+			if (res != null){
+				break;
+			}
+		}
+		return res;
+	}
+
 	public DTODocDirector(String[] buiderClasses) {
 		for (String builder : buiderClasses){
 			if (!isBuilderInList(builder)){

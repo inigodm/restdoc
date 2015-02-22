@@ -12,11 +12,11 @@ import org.reflections.Reflections;
 import com.documentation.annotations.exceptions.NotARESTServiceException;
 import com.documentation.model.DocService;
 import com.restdoc.contextreaders.abstracts.AbstractContextReader;
-import com.restdoc.docbuilders.classdocbuilders.DTODocGenerator;
+import com.restdoc.docbuilders.classdocbuilders.DTODocDirector;
 import com.sun.jersey.api.NotFoundException;
 
 public abstract class ServiceDocBuilder {
-	protected DTODocGenerator dtoDocGenerator;
+	protected DTODocDirector dtoDocDirector;
 	/**
 	 * Used to determine which annotation will mark a class like a REST service that this 
 	 * ServiceDocBuilder is able to scan for info
@@ -33,7 +33,7 @@ public abstract class ServiceDocBuilder {
 	 * @param restServiceAnn
 	 */
 	protected ServiceDocBuilder(Class<? extends Annotation> restServiceAnn){
-		dtoDocGenerator = new DTODocGenerator(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
+		dtoDocDirector = new DTODocDirector(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
 		annotationToLocateInClasses = restServiceAnn;
 	}
 	
