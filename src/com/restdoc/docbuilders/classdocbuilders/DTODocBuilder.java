@@ -6,7 +6,6 @@ package com.restdoc.docbuilders.classdocbuilders;
 import java.util.ArrayList;
 import java.util.Set;
 
-import com.documentation.annotations.exceptions.NotARESTServiceException;
 import com.documentation.model.DocClass;
 import com.documentation.model.DocClasses;
 import com.restdoc.contextreaders.abstracts.AbstractContextReader;

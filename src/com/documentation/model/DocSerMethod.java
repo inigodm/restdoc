@@ -2,6 +2,8 @@ package com.documentation.model;
 
 
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 import com.restdoc.annotations.ModelMethod;
@@ -15,6 +17,8 @@ public class DocSerMethod {
 	private String description;
 	private String modelpath;
 	private String producedMimetype;
+	private String returnedType;
+	private List<DocSerParam> params;
 	/**value : XML|JSON|XMLJSON,com.to.your.model.package
 	 * @return
 	 */
@@ -24,6 +28,7 @@ public class DocSerMethod {
 	 * @return
 	 */
 	private DocClass consumedObject;
+	
 	/**
 	 * @return the consumedObject
 	 */
@@ -127,5 +132,29 @@ public class DocSerMethod {
 	 */
 	public void setConsumedMimetype(String consumedMimetype) {
 		this.consumedMimetype = consumedMimetype;
+	}
+	/**
+	 * @return the params
+	 */
+	public List<DocSerParam> getParams() {
+		return params;
+	}
+	/**
+	 * @param params the params to set
+	 */
+	public void setParams(List<DocSerParam> params) {
+		this.params = params;
+	}
+	/**
+	 * @return the returnedType
+	 */
+	public String getReturnedType() {
+		return returnedType;
+	}
+	/**
+	 * @param returnedType the returnedType to set
+	 */
+	public void setReturnedType(String returnedType) {
+		this.returnedType = returnedType;
 	}
 }

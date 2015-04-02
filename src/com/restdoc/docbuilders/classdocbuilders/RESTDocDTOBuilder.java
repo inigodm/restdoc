@@ -3,14 +3,10 @@ package com.restdoc.docbuilders.classdocbuilders;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import org.reflections.Reflections;
-
-import com.documentation.annotations.exceptions.NotARESTServiceException;
 import com.documentation.model.DocClass;
 import com.documentation.model.DocField;
 import com.restdoc.annotations.ModelClass;
 import com.restdoc.annotations.ModelMethod;
-import com.restdoc.annotations.RESTService;
 
 public class RESTDocDTOBuilder extends DTODocBuilder{
 	
@@ -84,7 +80,7 @@ public class RESTDocDTOBuilder extends DTODocBuilder{
 	 * @return
 	 * @throws NotARESTServiceException 
 	 */
-	private Reflections getModelFromServiceAnnotation(final RESTService rser) throws NotARESTServiceException{
+	/*private Reflections getModelFromServiceAnnotation(final RESTService rser) throws NotARESTServiceException{
 		if (rser == null){
 			throw new NotARESTServiceException("No hay @RESTService ");
 		}
@@ -94,5 +90,5 @@ public class RESTDocDTOBuilder extends DTODocBuilder{
 			models = new Reflections(modelpath);
 		}
 		return models;
-	}
+	}*/
 }

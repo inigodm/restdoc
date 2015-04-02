@@ -63,6 +63,10 @@ public class RESTDocServiceTest {
 			    assertEquals(method.getProducedObject().getName(), methodtoTest.getProducedObject().getName());
 			}
 		}
+		System.out.println("test");
+		String result = rest.doPut("test");
+		assertEquals(result, "test");
+		
 	}
 	
 	@Test

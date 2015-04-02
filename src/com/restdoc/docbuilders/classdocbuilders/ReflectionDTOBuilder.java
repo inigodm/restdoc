@@ -5,10 +5,8 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.documentation.annotations.exceptions.NotARESTServiceException;
 import com.documentation.model.DocClass;
 import com.documentation.model.DocField;
-import com.restdoc.contextreaders.abstracts.AbstractContextReader;
 
 public class ReflectionDTOBuilder extends DTODocBuilder {
 	
