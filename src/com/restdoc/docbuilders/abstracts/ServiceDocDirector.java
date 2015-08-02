@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import com.documentation.model.DocService;
+import com.restdoc.docbuilders.ServiceDocBuilder;
 
 public abstract class ServiceDocDirector {
 	protected ArrayList<ServiceDocBuilder> builders = new ArrayList<ServiceDocBuilder>();

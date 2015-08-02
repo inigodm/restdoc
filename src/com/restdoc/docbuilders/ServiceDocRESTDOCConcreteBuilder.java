@@ -5,14 +5,11 @@ import java.util.ArrayList;
 import java.util.Set;
 
 import com.documentation.annotations.exceptions.NotARESTServiceException;
-import com.documentation.model.DocClass;
 import com.documentation.model.DocSerMethod;
 import com.documentation.model.DocService;
 import com.restdoc.annotations.RESTMethod;
+import com.restdoc.annotations.RESTParam;
 import com.restdoc.annotations.RESTService;
-import com.restdoc.contextreaders.abstracts.AbstractContextReader;
-import com.restdoc.docbuilders.abstracts.ServiceDocBuilder;
-import com.restdoc.docbuilders.classdocbuilders.DTODocDirector;
 
 /** Genera los datos de un servicio
  * @author inigo
@@ -55,7 +52,6 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 			this.serviceDocument = new DocService();
 			this.ser = (RESTService) annotatedClass.getAnnotation(annotationToLocateInClasses);
 			this.path = ser.path();
-			this.dtoDocDirector = new DTODocDirector(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			throw new NotARESTServiceException("La clase "+ annotatedClass.getName()+ " no se ha podido leer como @RESTService", e);
@@ -102,7 +98,7 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
 	
 	private DocSerMethod buildMethodDoc(Method method){
 		RESTMethod mets = method.getAnnotation(RESTMethod.class);
-    	DocSerMethod methodDocument = null;
+		DocSerMethod methodDocument = null;
     	if (mets != null){
     		methodDocument = new DocSerMethod();
     		methodDocument.setMethod(mets.httpMethod());
@@ -110,17 +106,16 @@ public class ServiceDocRESTDOCConcreteBuilder extends ServiceDocBuilder {
     		methodDocument.setPath(mets.path());
     		methodDocument.setModelpath(mets.modelpath());
     		methodDocument.setProducedMimetype(mets.productedMimetype());
-    		methodDocument.setProducedObject(getClassDoc(mets.producedObject()));
+    		methodDocument.setProducedObject(dtoDocDirector.buildDoc(mets.producedObject()));
     		methodDocument.setConsumedMimetype(mets.consumedMimetype());
-    		methodDocument.setConsumedObject(getClassDoc(mets.consumedObject()));
+    		methodDocument.setConsumedObject(dtoDocDirector.buildDoc(mets.consumedObject()));
+    		//RESTParam params = method.getAnnotations(RESTParam.class);
+        	//methodDocument.setParams(obtainParameters(params));
+    		// TODO: add pathparams, queryparams and formparams
     		}
     	return methodDocument;
 	}
 	
-	public DocClass getClassDoc(String classname){
-		return dtoDocDirector.buildDoc(classname);
-	}
-
 	public String[] getDtopaths() {
 		return dtopaths;
 	}

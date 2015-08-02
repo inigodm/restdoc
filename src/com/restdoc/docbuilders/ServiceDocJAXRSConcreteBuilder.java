@@ -4,10 +4,13 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -18,13 +21,9 @@ import javax.ws.rs.QueryParam;
 
 import com.documentation.annotations.exceptions.NotARESTServiceException;
 import com.documentation.model.DocClass;
-import com.documentation.model.DocField;
 import com.documentation.model.DocSerMethod;
 import com.documentation.model.DocSerParam;
 import com.documentation.model.DocService;
-import com.restdoc.contextreaders.abstracts.AbstractContextReader;
-import com.restdoc.docbuilders.abstracts.ServiceDocBuilder;
-import com.restdoc.docbuilders.classdocbuilders.DTODocDirector;
 import com.restdoc.docbuilders.classdocbuilders.ReflectionDTOBuilder;
 
 /** Genera los datos de un servicio a partir de las etiquetas JAX-RS
@@ -54,7 +53,6 @@ public class ServiceDocJAXRSConcreteBuilder extends ServiceDocBuilder {
 			this.annotatedClass = annotatedClass;
 			this.serviceDocument = new DocService();
 			this.path = (Path) annotatedClass.getAnnotation(Path.class);
-			this.dtoDocDirector = new DTODocDirector(AbstractContextReader.getContextReader().readAvailableDTODocGenerators());
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			throw new NotARESTServiceException("La clase "+ annotatedClass.getName()+ " no se ha podido leer como @RESTService", e);
@@ -108,14 +106,10 @@ public class ServiceDocJAXRSConcreteBuilder extends ServiceDocBuilder {
     	ReflectionInfoBuilder refManager = new ReflectionInfoBuilder(methodDocument);
     	annManager.putAnnotationsInfo();
     	refManager.extractInfoFromReturnedType(method);
-    	//annManager.putParamAnnotationsInfo();
+    	annManager.putParamAnnotationsInfo();
     	return methodDocument;
 	}
 	
-	public DocClass getClassDoc(String classname){
-		return dtoDocDirector.buildDoc(classname);
-	}
-
 	public String[] getDtopaths() {
 		return dtopaths;
 	}
@@ -123,9 +117,7 @@ public class ServiceDocJAXRSConcreteBuilder extends ServiceDocBuilder {
 	public void setDtopaths(String[] dtopaths) {
 		this.dtopaths = dtopaths;
 	}
-
 }
-
 
 class ReflectionInfoBuilder{
 	
@@ -137,17 +129,26 @@ class ReflectionInfoBuilder{
 		this.methodDocument = methodDocument;
 	}
 	
+	public ReflectionInfoBuilder(){
+		rdtob = new ReflectionDTOBuilder();
+	}
+
+	
 	public void extractInfoFromReturnedType(Method method){
 		Class<?> returnedClass = method.getReturnType();
 		methodDocument.setProducedObject(rdtob.buildDoc(returnedClass.getName()));
+	}
+	
+	public DocClass extractInfoFromClass(String clazzName){
+		return rdtob.buildDoc(clazzName);
 	}
 }
 
 class AnnotationsManager{
 	Method method;
 	DocSerMethod methodDocument = new DocSerMethod();
-	HashMap<Class<?>, AnnotationInfoExtractor> methodAnnotationExtractors = new HashMap<Class<?>, AnnotationInfoExtractor>();
-	HashMap<Class<?>, AnnotationInfoExtractor> methodParamAnnotationExtractors = new HashMap<Class<?>, AnnotationInfoExtractor>();
+	Map<Class<?>, AnnotationInfoExtractor> methodAnnotationExtractors = new HashMap<Class<?>, AnnotationInfoExtractor>();
+	Map<Class<?>, ParamAnnotationInfoExtractor> methodParamAnnotationExtractors = new HashMap<Class<?>, ParamAnnotationInfoExtractor>();
 	public AnnotationsManager(Method method, DocSerMethod methodDocument){
 		this.method = method;
 		this.methodDocument = methodDocument;
@@ -158,40 +159,38 @@ class AnnotationsManager{
 		methodAnnotationExtractors.put(PUT.class, new PutExtractor(methodDocument));
 		methodAnnotationExtractors.put(POST.class, new PostExtractor(methodDocument));
 		methodAnnotationExtractors.put(DELETE.class, new DeleteExtractor(methodDocument));
-		methodParamAnnotationExtractors.put(PathParam.class, new PathParamExtractor(methodDocument));
-		//methodParamAnnotationExtractors.put(QueryParam.class, new QueryParamExtractor(methodDocument));
-		//methodParamAnnotationExtractors.put(FormParam.class, new FormParamExtractor(methodDocument));
+		methodParamAnnotationExtractors.put(PathParam.class, new PathParamExtractor());
+		methodParamAnnotationExtractors.put(QueryParam.class, new QueryParamExtractor());
+		methodParamAnnotationExtractors.put(FormParam.class, new FormParamExtractor());
 	}
 
-	public void putParamInfo() {
-		DocField field = new DocField();
+	public void putParamAnnotationsInfo() {
+		List<DocSerParam> res = new ArrayList<DocSerParam>();
 		Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-		System.out.println("paramanns: " + parameterAnnotations.length);
-		System.out.println("paramanns: " + method.getName());
 		Class<?>[] classes = method.getParameterTypes();
 		for (int i = 0; i < classes.length; i++){
-			System.out.println(classes[i] + " param annotation " + parameterAnnotations[i]);
-			putParamInfo(classes[i], parameterAnnotations[i]);
+			res.add(buildParamInfo(classes[i], parameterAnnotations[i]));
 		}
+		methodDocument.setParams(res);
 	}
 
-	private void putParamInfo(Class<?> paramType, Annotation[] annotations) {
-		if (annotations.length == 0){
-			return;
-		}
-		DocSerParam param = new DocSerParam()
+	private DocSerParam buildParamInfo(Class<?> paramType, Annotation[] annotations) {
+		DocSerParam res = new DocSerParam();
+		ReflectionInfoBuilder rib = new ReflectionInfoBuilder();
+		res.setParamType(rib.extractInfoFromClass(paramType.getName()));
 		for (Annotation ann : annotations){
-			putParamAnnotationInfo(ann, );
-		//	param.setRestParamType();
+			System.out.println("dd" + ann.getClass());
+			putParamAnnotationInfo(res, ann);
 		}
-		//param.setParamType(paramType);
-		//param.setName(name);
-		
-		//insertParamInfo
+		return res;
 	}
 
-	private void putParamAnnotationInfo(Annotation ann, Class<?> paramType) {
-		
+	private void putParamAnnotationInfo(DocSerParam dsp, Annotation ann) {
+		ParamAnnotationInfoExtractor extractor = methodParamAnnotationExtractors.get(ann.annotationType());
+		if (extractor != null){
+			extractor.setDocParam(dsp);
+			extractor.extractInfo(ann);
+		}
 	}
 
 	/** Extracts info from method's JAX-RS annotations 
@@ -320,15 +319,39 @@ class ConsumesExtractor extends AnnotationInfoExtractor{
 	}
 }
 
-class PathParamExtractor extends AnnotationInfoExtractor{
+abstract class ParamAnnotationInfoExtractor{
+	protected DocSerParam dsp;
+	
+	public void setDocParam(DocSerParam dsp){
+		this.dsp = dsp;
+	}
+	
+	public abstract void extractInfo(Annotation annotation);
+}
 
-	public PathParamExtractor(DocSerMethod methodDocument) {
-		super(methodDocument);
-	}
-	
+class PathParamExtractor extends ParamAnnotationInfoExtractor{
 	@Override
-	public void extractInfo(Annotation annotation, Class<?> clazz){
-		methodDocument.
+	public void extractInfo(Annotation annotation){
+		PathParam ann = (PathParam)annotation;
+		dsp.setRestParamType(DocSerParam.PATHPARAM);
+		dsp.putAnnotation("param_name", ann.value());
 	}
-	
+}
+
+class QueryParamExtractor extends ParamAnnotationInfoExtractor{
+	@Override
+	public void extractInfo(Annotation annotation){
+		QueryParam ann = (QueryParam)annotation;
+		dsp.setRestParamType(DocSerParam.PATHPARAM);
+		dsp.putAnnotation("param_name", ann.value());
+	}
+}
+
+class FormParamExtractor extends ParamAnnotationInfoExtractor{
+	@Override
+	public void extractInfo(Annotation annotation){
+		FormParam ann = (FormParam)annotation;
+		dsp.setRestParamType(DocSerParam.PATHPARAM);
+		dsp.putAnnotation("param_name", ann.value());
+	}
 }

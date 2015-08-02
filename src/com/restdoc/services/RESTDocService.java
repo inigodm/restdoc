@@ -4,6 +4,7 @@
 package com.restdoc.services;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -18,8 +19,8 @@ import com.documentation.model.DocServices;
 import com.restdoc.annotations.RESTMethod;
 import com.restdoc.annotations.RESTService;
 import com.restdoc.contextreaders.abstracts.AbstractContextReader;
-import com.restdoc.docbuilders.ServiceDocGenerator;
 import com.restdoc.docbuilders.abstracts.ServiceDocDirector;
+import com.restdoc.docbuilders.abstracts.ServiceDocGenerator;
 import com.sun.jersey.api.core.ResourceConfig;
 
 /** Servicio que muestra la informacion de todos los servicios REST desplegados en la presente aplicacion web
@@ -56,7 +57,7 @@ public class RESTDocService {
 		String[] jerseyPath = contexReader.readPackagesToDocumentate();
 		sdd = new ServiceDocGenerator(contexReader.readAvailableDocGenerators());
 		DocServices services = new DocServices();
-		ArrayList<DocService> serv = new ArrayList<DocService>();
+		List<DocService> serv = new ArrayList<DocService>();
 		for (String packag : jerseyPath){
 			serv.addAll(sdd.generateDocForPackage(packag));
 		}
@@ -67,7 +68,7 @@ public class RESTDocService {
 	@PUT
 	@Path("{param1}/put")
 	@Produces(MediaType.APPLICATION_JSON)
-	public String doPut(@PathParam(value = "") String param1){
+	public String doPut(@PathParam(value = "valor") String param1, @PathParam(value = "valor2") Integer param2){
 		System.out.println("llega " + param1);
 		return param1;	
 	}

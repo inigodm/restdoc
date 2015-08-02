@@ -3,6 +3,8 @@
  */
 package com.documentation.model;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**

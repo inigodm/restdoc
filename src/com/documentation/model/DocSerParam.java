@@ -3,14 +3,20 @@
  */
 package com.documentation.model;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * @author inigo
  *
  */
 public class DocSerParam {
+	public static String PATHPARAM = "PathParam";
 	private String name;
 	private String restParamType;
 	private DocClass paramType;
+	private Map<String, String> annotationKeyValues;
 	
 	public DocClass getParamType() {
 		return paramType;
@@ -34,5 +40,20 @@ public class DocSerParam {
 	
 	public void setRestParamType(String restParamType) {
 		this.restParamType = restParamType;
+	}
+
+	public void putAnnotation(String key, String value) {
+		if (annotationKeyValues == null){
+			annotationKeyValues = new LinkedHashMap<String, String>();
+		}
+		annotationKeyValues.put(key, value);
+	}
+
+	public Map<String, String> getAnnotationKeyValues() {
+		return annotationKeyValues;
+	}
+
+	public void setAnnotationKeyValues(Map<String, String> annotationKeyValues) {
+		this.annotationKeyValues = annotationKeyValues;
 	}
 }
